@@ -1,4 +1,10 @@
 class NSACache(object):
+    """
+    An implementation of an n-way set associative cache.
+
+    Performs O(1) lookups against elements in each cache.
+    """
+
     def __init__(self, key_type,
                  val_type, eviction_strategy,
                  num_cache, cache_size, hashing_function=None):
@@ -27,7 +33,7 @@ class NSACache(object):
             if fallback is not None:
                 return fallback
             raise KeyError('Key {} not found.'.format(key))
-        return response
+        return response.val
 
     @staticmethod
     def check_key_type_immutable(key_type):
@@ -48,7 +54,8 @@ class NSACache(object):
 
     def _hash_key_to_cache(self, key):
         if self.hash_func is not None:
-            # user defined hashing function for better availability
+            # user's own hashing function for better customisability
+
             cache_index = self.hash_func(key, self.num_cache)
             return cache_index
         else:
@@ -56,6 +63,7 @@ class NSACache(object):
 
     @staticmethod
     def get_n_caches(eviction_strategy, num_cache, cache_size):
+        """Initializes n caches of the type of eviction_strategy specified"""
 
         if eviction_strategy == "LRU":
             from codes.cache import LRUCache
@@ -69,17 +77,3 @@ class NSACache(object):
 
         raise ValueError('{} is not an accepted eviction strategy'
                          .format(eviction_strategy))
-
-
-if __name__ == "__main__":
-    nsac = NSACache(int, int, "SF", 1, 3)
-    nsac.put("2", 1)
-    nsac.put(2, 2)
-    nsac.put(3, 3)
-    nsac.put(4, 4)
-    x = nsac.get(2)
-    nsac.put(5, 5)
-    nsac.put(4, 4)
-    nsac.put(6, 6)
-    n = nsac.get(10, 5)
-    print(nsac.caches[0])

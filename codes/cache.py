@@ -2,6 +2,12 @@ from abc import ABC, abstractmethod
 
 
 class Cache(ABC):
+    """
+    Abstract class for other Caches to inherit from.
+    Implements only the dictionary lookup and manipulation methods which are
+    shared across child classes
+    """
+
     def __init__(self, capacity):
         self.capacity = capacity
         self.current_size = 0
@@ -29,6 +35,8 @@ class Cache(ABC):
 
 
 class LRUCache(Cache):
+    """An implementation of the least recently utilised eviction strategy"""
+
     def __init__(self, capacity):
         from codes.data_structure import DLLDataStructure
         super().__init__(capacity)
@@ -36,6 +44,16 @@ class LRUCache(Cache):
         self.data_structure = DLLDataStructure()
 
     def put(self, key, value):
+        """
+        Make a DLLCacheEntry from key and value, then add to cache if
+        it does not exist already. If it exists, bring to most recently
+        used position in cache.
+        If size exceeds capacity, remove oldest element.
+
+        :param key: an immutable key
+        :param value: an arbitrarily typed value
+        :return: None
+        """
         from codes.cache_entry import DLLCacheEntry
         cache_entry = DLLCacheEntry(key, value)
 
@@ -55,6 +73,14 @@ class LRUCache(Cache):
             self.current_size -= 1
 
     def get(self, key):
+        """
+        Get if available in cache through amortized O(1) lookup.
+        If available, bring to most recently used position in cache.
+        Returns None if key not in cache.
+
+        :param key: an immutable key
+        :return: a DLLCacheEntry object or None
+        """
         old_cache_entry = self.get_from_lookup_dict(key)
         if old_cache_entry is None:
             return None
@@ -70,6 +96,8 @@ class LRUCache(Cache):
 
 
 class MRUCache(Cache):
+    """An implementation of the most recently used eviction strategy"""
+
     def __init__(self, capacity):
         from codes.data_structure import DLLDataStructure
         super().__init__(capacity)
@@ -77,6 +105,17 @@ class MRUCache(Cache):
         self.data_structure = DLLDataStructure()
 
     def put(self, key, value):
+        """
+        Make a DLLCacheEntry from key and value, then add to cache if it does
+        not exist already. If it does, bring to most recently used position in
+        cache.
+        If size exceeds capacity, replace most recently accessed element with
+        new DLLCacheEntry.
+
+        :param key: an immutable key
+        :param value: an arbitrarily typed value
+        :return: None
+        """
         from codes.cache_entry import DLLCacheEntry
         cache_entry = DLLCacheEntry(key, value)
 
@@ -96,6 +135,14 @@ class MRUCache(Cache):
         self.current_size += 1
 
     def get(self, key):
+        """
+        Get if available in cache through amortized O(1) lookup.
+        If available, bring to most recently used position in cache.
+        Returns None if key not in cache.
+
+        :param key: an immutable key
+        :return: a DLLCacheEntry object or None
+        """
         old_cache_entry = self.get_from_lookup_dict(key)
         if old_cache_entry is None:
             return None
@@ -112,6 +159,8 @@ class MRUCache(Cache):
 
 
 class SFCache(Cache):
+    """An implementation of the smallest key first eviction strategy"""
+
     def __init__(self, capacity):
         from codes.data_structure import MinHeapDataStructure
         super().__init__(capacity)
@@ -119,6 +168,14 @@ class SFCache(Cache):
         self.data_structure = MinHeapDataStructure()
 
     def put(self, key, value):
+        """
+        Make a SFCacheEntry from key and value, then
+        add to cache if object does not exist in cache.
+
+        :param key: an immutable key
+        :param value: an arbitrarily typed value
+        :return: None
+        """
         from codes.cache_entry import HeapCacheEntry
         cache_entry = HeapCacheEntry(key, value)
 
@@ -135,6 +192,13 @@ class SFCache(Cache):
         self.current_size += 1
 
     def get(self, key):
+        """
+        Returns the HeapCacheEntry through O(1) lookup.
+        Returns None if key not in cache.
+
+        :param key: an immutable key
+        :return: a HeapCacheEntry object or None
+        """
         return self.get_from_lookup_dict(key)
 
     def __repr__(self):

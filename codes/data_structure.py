@@ -7,6 +7,13 @@ class DLLDataStructure(object):
         self.tail.prev = self.head
 
     def dll_add(self, cache_entry, predecessor):
+        """
+        Add to the double linked list after DLLCacheEntry="predecessor"
+
+        :param cache_entry: a DLLCacheEntry object
+        :param predecessor: DLLCacheEntry object after which to insert cache_entry
+        :return: None
+        """
         cache_entry.next = predecessor.next
         cache_entry.prev = predecessor
         predecessor.next.prev = cache_entry
@@ -20,6 +27,10 @@ class DLLDataStructure(object):
 
 
 class MinHeapDataStructure(object):
+    """
+    Supports basic heap operations such as push, pop and peak.
+    """
+
     def __init__(self):
         self.min_heap = []
 
