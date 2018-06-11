@@ -1,208 +1,86 @@
-from abc import ABC, abstractmethod
+from codes.eviction_factory import eviction_factory
 
 
-class Cache(ABC):
+class Cache(object):
     """
-    Abstract class for other Caches to inherit from.
-    Implements only the dictionary lookup and manipulation methods which are
-    shared across child classes
+    A cache responsible for:
+    1. Passing on put() and get() methods to an eviction_strategy implementation through a chain of responsibility.
+    2. Providing O(1) lookup functionality for the eviction strategy implementation.
+
+    What the cache is not responsible for:
+    1. Defining and maintaining the data structure for an eviction strategy's idiosyncratic requirements.
+    2. Not responsible for defining which object to evict.
+
+    To wire in a "Custom" strategy, remember to:
+    1. Write custom implementation inside eviction_strategy.py
+    2. Add it to the EVICTION_STRATEGY_REGISTRY (inside eviction_factory.py)
+
     """
 
-    def __init__(self, capacity):
+    def __init__(self, eviction_strategy, capacity):
+        """
+        :param eviction_strategy: One of ["LRU", "MRU", "SF"] by default.
+        :param capacity: Size of the cache.
+        """
+
+        self.eviction_strategy = eviction_factory(eviction_strategy)()
         self.capacity = capacity
         self.current_size = 0
-        self.key_lookup = {}
+        self.lookup_dict = {}
 
-    def pop_from_lookup_dict(self, key):
-        return self.key_lookup.pop(key, None)
+    def put(self, key, value):
+        """
+        Insert the key-value pair object into cache.
 
-    def add_to_lookup_dict(self, key, to_add):
-        self.key_lookup[key] = to_add
+        :param key: Key of type "key_type" specified at instantiation of NSACache
+        :param value: Value of type "value_type" specified at instantiation of NSACache
+        :return: None
+        """
+        if key is None:
+            raise ValueError('Key cannot be None')
+        self.eviction_strategy.put(self, key, value)
 
-    def exists_in_lookup_dict(self, key):
-        return key in self.key_lookup
+    def get(self, key):
+        """
+        Get the key-value pair object from the cache. Amortized O(1) lookup.
+
+        :param key: Key of type "key_type" specified at instantiation of NSACache.
+        :return: Value of type "value_type" specified at instantiation of NSACache.
+        """
+
+        result = self.eviction_strategy.get(self, key)
+        if result is not None:
+            return result.value
+        return None
+
+    def exists_in_lookup_dict(self, item):
+        return item.key in self.lookup_dict
 
     def get_from_lookup_dict(self, key):
-        return self.key_lookup.get(key, None)
-
-    @abstractmethod
-    def put(self, key, value):
-        pass
-
-    @abstractmethod
-    def get(self, key):
-        pass
-
-
-class LRUCache(Cache):
-    """An implementation of the least recently utilised eviction strategy"""
-
-    def __init__(self, capacity):
-        from codes.data_structure import DLLDataStructure
-        super().__init__(capacity)
-
-        self.data_structure = DLLDataStructure()
-
-    def put(self, key, value):
         """
-        Make a DLLCacheEntry from key and value, then add to cache if
-        it does not exist already. If it exists, bring to most recently
-        used position in cache.
-        If size exceeds capacity, remove oldest element.
+        Amortized O(1) lookup for a key in this cache's dictionary.
 
-        :param key: an immutable key
-        :param value: an arbitrarily typed value
+        :param key: Key of type "key_type" specified at instantiation of NSACache.
+        :return: Value of type "value_type" specified at instantiation of NSACache.
+        """
+        return self.lookup_dict.get(key, None)
+
+    def pop_from_lookup_dict(self, key):
+        """
+        Remove a key-value pair only from the cache's dictionary.
+
+        :param key: Key of type "key_type" specified at instantiation of NSACache.
+        :return: Key-value pair object that this key shall map to.
+        """
+        return self.lookup_dict.pop(key)
+
+    def add_to_lookup_dict(self, key, to_add):
+        """
+        Add a key-value pair to this cache's dictionary for fast lookup.
+
+        :param key: Key of type "key_type" specified at instantiation of NSACache
+        :param to_add: Key-value pair object that this key shall map to.
         :return: None
         """
-        from codes.cache_entry import DLLCacheEntry
-        cache_entry = DLLCacheEntry(key, value)
+        self.lookup_dict[key] = to_add
 
-        old_cache_entry = self.get_from_lookup_dict(key)
-        if old_cache_entry is not None:
-            self.pop_from_lookup_dict(key)
-            old_cache_entry.disconnect()
-            self.current_size -= 1
-
-        self.add_to_lookup_dict(key, cache_entry)
-        self.data_structure.dll_add(cache_entry, self.data_structure.head)
-        self.current_size += 1
-
-        if self.current_size > self.capacity:
-            tail = self.pop_from_lookup_dict(self.data_structure.tail.prev.key)
-            tail.disconnect()
-            self.current_size -= 1
-
-    def get(self, key):
-        """
-        Get if available in cache through amortized O(1) lookup.
-        If available, bring to most recently used position in cache.
-        Returns None if key not in cache.
-
-        :param key: an immutable key
-        :return: a DLLCacheEntry object or None
-        """
-        old_cache_entry = self.get_from_lookup_dict(key)
-        if old_cache_entry is None:
-            return None
-        old_cache_entry.disconnect()
-        self.data_structure.dll_add(old_cache_entry, self.data_structure.head)
-        return old_cache_entry
-
-    def __repr__(self):
-        return "LRUCache(" \
-               + ','.join([str(cache_ent)
-                           for cache_ent in self.data_structure]) \
-               + ")"
-
-
-class MRUCache(Cache):
-    """An implementation of the most recently used eviction strategy"""
-
-    def __init__(self, capacity):
-        from codes.data_structure import DLLDataStructure
-        super().__init__(capacity)
-
-        self.data_structure = DLLDataStructure()
-
-    def put(self, key, value):
-        """
-        Make a DLLCacheEntry from key and value, then add to cache if it does
-        not exist already. If it does, bring to most recently used position in
-        cache.
-        If size exceeds capacity, replace most recently accessed element with
-        new DLLCacheEntry.
-
-        :param key: an immutable key
-        :param value: an arbitrarily typed value
-        :return: None
-        """
-        from codes.cache_entry import DLLCacheEntry
-        cache_entry = DLLCacheEntry(key, value)
-
-        old_cache_entry = self.get_from_lookup_dict(key)
-        if old_cache_entry is not None:
-            self.pop_from_lookup_dict(key)
-            old_cache_entry.disconnect()
-            self.current_size -= 1
-
-        if self.current_size == self.capacity:
-            tail = self.pop_from_lookup_dict(self.data_structure.tail.prev.key)
-            tail.disconnect()
-            self.current_size -= 1
-
-        self.add_to_lookup_dict(key, cache_entry)
-        self.data_structure.dll_add(cache_entry, self.data_structure.tail.prev)
-        self.current_size += 1
-
-    def get(self, key):
-        """
-        Get if available in cache through amortized O(1) lookup.
-        If available, bring to most recently used position in cache.
-        Returns None if key not in cache.
-
-        :param key: an immutable key
-        :return: a DLLCacheEntry object or None
-        """
-        old_cache_entry = self.get_from_lookup_dict(key)
-        if old_cache_entry is None:
-            return None
-        old_cache_entry.disconnect()
-        self.data_structure.dll_add(old_cache_entry,
-                                    self.data_structure.tail.prev)
-        return old_cache_entry
-
-    def __repr__(self):
-        return "MRUCache(" \
-               + ','.join([str(cache_ent)
-                           for cache_ent in self.data_structure]) \
-               + ")"
-
-
-class SFCache(Cache):
-    """An implementation of the smallest key first eviction strategy"""
-
-    def __init__(self, capacity):
-        from codes.data_structure import MinHeapDataStructure
-        super().__init__(capacity)
-
-        self.data_structure = MinHeapDataStructure()
-
-    def put(self, key, value):
-        """
-        Make a SFCacheEntry from key and value, then
-        add to cache if object does not exist in cache.
-
-        :param key: an immutable key
-        :param value: an arbitrarily typed value
-        :return: None
-        """
-        from codes.cache_entry import HeapCacheEntry
-        cache_entry = HeapCacheEntry(key, value)
-
-        old_cache_entry = self.get_from_lookup_dict(key)
-        if old_cache_entry is not None:
-            old_cache_entry.value = value
-            return
-        if self.current_size == self.capacity:
-            min_cache_entry = self.data_structure.pop()
-            self.pop_from_lookup_dict(min_cache_entry.key)
-            self.current_size -= 1
-        self.data_structure.push(cache_entry)
-        self.add_to_lookup_dict(key, cache_entry)
-        self.current_size += 1
-
-    def get(self, key):
-        """
-        Returns the HeapCacheEntry through O(1) lookup.
-        Returns None if key not in cache.
-
-        :param key: an immutable key
-        :return: a HeapCacheEntry object or None
-        """
-        return self.get_from_lookup_dict(key)
-
-    def __repr__(self):
-        return "SFCache(" \
-               + ','.join([str(cache_ent)
-                           for cache_ent in self.data_structure]) \
-               + ')'

@@ -1,0 +1,15 @@
+[
+  "tests/test_cache_general.py::TestGeneralThings::test_key_is_none",
+  "tests/test_lru_cache.py::TestLRUSystem::test_lru_system_int_input",
+  "tests/test_lru_cache.py::TestLRUSystem::test_lru_system_tuple_input",
+  "tests/test_mru_cache.py::TestMRUSystem::test_mru_system_int_input",
+  "tests/test_mru_cache.py::TestMRUSystem::test_mru_system_tuple_input",
+  "tests/test_nsacache_general.py::TestNSACacheSystem::test_key_type_mutable",
+  "tests/test_nsacache_general.py::TestNSACacheSystem::test_kv_type_mismatch",
+  "tests/test_nsacache_system.py::TestNSACacheSystem::test_nsacache_system_lru",
+  "tests/test_nsacache_system.py::TestNSACacheSystem::test_nsacache_system_mru",
+  "tests/test_nsacache_system.py::TestNSACacheSystem::test_nsacache_system_sf",
+  "tests/test_smallest_first_cache.py::TestSmallestFirstSystem::test_evicts_smallest",
+  "tests/test_smallest_first_cache.py::TestSmallestFirstSystem::test_smallest_first_system_int_input",
+  "tests/test_smallest_first_cache.py::TestSmallestFirstSystem::test_smallest_first_system_str_input"
+]
