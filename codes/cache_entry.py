@@ -30,7 +30,9 @@ class DLLCacheEntry(CacheEntry):
 
     def disconnect(self):
         """
-        Disconnect a LinkedList node by wiring the node previous and next to the current node.
+        Disconnect a LinkedList node by wiring the node previous and next to
+        the current node.
+
         :return: None
         """
         self.next.prev = self.prev

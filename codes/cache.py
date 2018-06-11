@@ -4,11 +4,14 @@ from codes.eviction_factory import eviction_factory
 class Cache(object):
     """
     A cache responsible for:
-    1. Passing on put() and get() methods to an eviction_strategy implementation through a chain of responsibility.
-    2. Providing O(1) lookup functionality for the eviction strategy implementation.
+    1. Passing on put() and get() methods to an eviction_strategy
+        implementation through a chain of responsibility.
+    2. Providing O(1) lookup functionality for the eviction strategy
+        implementation.
 
     What the cache is not responsible for:
-    1. Defining and maintaining the data structure for an eviction strategy's idiosyncratic requirements.
+    1. Defining and maintaining the data structure for an eviction strategy's
+        idiosyncratic requirements.
     2. Not responsible for defining which object to evict.
 
     To wire in a "Custom" strategy, remember to:
@@ -32,8 +35,10 @@ class Cache(object):
         """
         Insert the key-value pair object into cache.
 
-        :param key: Key of type "key_type" specified at instantiation of NSACache
-        :param value: Value of type "value_type" specified at instantiation of NSACache
+        :param key: Key of type "key_type" specified at instantiation of
+        NSACache
+        :param value: Value of type "value_type" specified at instantiation of
+        NSACache
         :return: None
         """
         if key is None:
@@ -44,8 +49,10 @@ class Cache(object):
         """
         Get the key-value pair object from the cache. Amortized O(1) lookup.
 
-        :param key: Key of type "key_type" specified at instantiation of NSACache.
-        :return: Value of type "value_type" specified at instantiation of NSACache.
+        :param key: Key of type "key_type" specified at instantiation of
+        NSACache.
+        :return: Value of type "value_type" specified at instantiation of
+        NSACache.
         """
 
         result = self.eviction_strategy.get(self, key)
@@ -60,8 +67,10 @@ class Cache(object):
         """
         Amortized O(1) lookup for a key in this cache's dictionary.
 
-        :param key: Key of type "key_type" specified at instantiation of NSACache.
-        :return: Value of type "value_type" specified at instantiation of NSACache.
+        :param key: Key of type "key_type" specified at instantiation of
+        NSACache.
+        :return: Value of type "value_type" specified at instantiation of
+        NSACache.
         """
         return self.lookup_dict.get(key, None)
 
@@ -69,7 +78,8 @@ class Cache(object):
         """
         Remove a key-value pair only from the cache's dictionary.
 
-        :param key: Key of type "key_type" specified at instantiation of NSACache.
+        :param key: Key of type "key_type" specified at instantiation of
+        NSACache.
         :return: Key-value pair object that this key shall map to.
         """
         return self.lookup_dict.pop(key)
@@ -78,9 +88,9 @@ class Cache(object):
         """
         Add a key-value pair to this cache's dictionary for fast lookup.
 
-        :param key: Key of type "key_type" specified at instantiation of NSACache
+        :param key: Key of type "key_type" specified at instantiation of
+        NSACache
         :param to_add: Key-value pair object that this key shall map to.
         :return: None
         """
         self.lookup_dict[key] = to_add
-
