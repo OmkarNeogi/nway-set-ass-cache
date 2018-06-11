@@ -1,7 +1,8 @@
 class DLLDataStructure(object):
     def __init__(self):
         """
-        A data structure for facilitating double linked list style operations and access.
+        A data structure for facilitating double linked list style operations
+        and access.
         """
 
         from codes.cache_entry import DLLCacheEntry

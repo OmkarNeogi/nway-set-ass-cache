@@ -5,13 +5,16 @@ from codes.data_structure import DLLDataStructure, HeapDataStructure
 
 
 class EvictionStrategy(ABC):
-    """Abstract class declaring methods to be overwritten if writing a new eviction algorithm."""
+    """Abstract class declaring methods to be overwritten if writing a new
+    eviction algorithm."""
 
     @abstractmethod
     def put(self, cache, key, value):
         """
-        :param cache: The Cache object to "visit" - perform insertion of object on. (Visitor pattern)
-        :param key: Key of type "key_type" specified at instantiation of NSACache
+        :param cache: The Cache object to "visit" - perform insertion of
+        object on. (Visitor pattern)
+        :param key: Key of type "key_type" specified at instantiation of
+        NSACache
         :param value: Value of type "value_type" specified at instantiation
         :return: None
         """
@@ -20,8 +23,10 @@ class EvictionStrategy(ABC):
     @abstractmethod
     def get(self, cache, key):
         """
-        :param cache: The Cache object to "visit" - perform insertion of object on. (Visitor pattern)
-        :param key: Key of type "key_type" specified at instantiation of NSACache
+        :param cache: The Cache object to "visit" - perform insertion of
+        object on. (Visitor pattern)
+        :param key: Key of type "key_type" specified at instantiation of
+        NSACache
         :return: None
         """
         raise NotImplementedError
@@ -37,10 +42,12 @@ class LRUEvictionStrategy(EvictionStrategy):
 
     def put(self, cache, key, value):
         """
-        Implements insertion of key-value objects into a cache using the LRU eviction strategy in a visitor pattern.
+        Implements insertion of key-value objects into a cache using the LRU
+        eviction strategy in a visitor pattern.
         Brings object to most recently used position.
 
-        :param cache: The Cache object to "visit" - perform insertion of object on. (Visitor pattern)
+        :param cache: The Cache object to "visit" - perform insertion of
+        object on. (Visitor pattern)
         :param key: Key of type "key_type" specified at instantiation
         :param value: Value of type "value_type" specified at instantiation
         :return: None
@@ -64,11 +71,13 @@ class LRUEvictionStrategy(EvictionStrategy):
 
     def get(self, cache, key):
         """
-        Returns object if exists in cache in an O(1) lookup. Brings object to most recently used position.
+        Returns object if exists in cache in an O(1) lookup. Brings object to
+        most recently used position.
 
-
-        :param cache: The Cache object to "visit" - perform insertion of object on. (Visitor pattern)
-        :param key: Key of type "key_type" specified at instantiation of NSACache
+        :param cache: The Cache object to "visit" - perform insertion of
+        object on. (Visitor pattern)
+        :param key: Key of type "key_type" specified at instantiation of
+        NSACache
         :return: Key-value object if found in cache, else None
         """
         old_entry = cache.get_from_lookup_dict(key)
@@ -89,10 +98,12 @@ class MRUEvictionStrategy(EvictionStrategy):
 
     def put(self, cache, key, value):
         """
-        Implements insertion of key-value objects into a cache using the MRU eviction strategy in a visitor pattern.
+        Implements insertion of key-value objects into a cache using the MRU
+        eviction strategy in a visitor pattern.
         Brings object to most recently used position.
 
-        :param cache: The Cache object to "visit" - perform insertion of object on. (Visitor pattern)
+        :param cache: The Cache object to "visit" - perform insertion of
+        object on. (Visitor pattern)
         :param key: Key of type "key_type" specified at instantiation
         :param value: Value of type "value_type" specified at instantiation
         :return: None
@@ -116,11 +127,13 @@ class MRUEvictionStrategy(EvictionStrategy):
 
     def get(self, cache, key):
         """
-        Returns object if exists in cache in an O(1) lookup. Brings object to most recently used position.
+        Returns object if exists in cache in an O(1) lookup. Brings object to
+        most recently used position.
 
-
-        :param cache: The Cache object to "visit" - perform insertion of object on. (Visitor pattern)
-        :param key: Key of type "key_type" specified at instantiation of NSACache
+        :param cache: The Cache object to "visit" - perform insertion of
+        object on. (Visitor pattern)
+        :param key: Key of type "key_type" specified at instantiation of
+        NSACache
         :return: Key-value object if found in cache, else None
         """
         old_entry = cache.get_from_lookup_dict(key)
@@ -140,10 +153,12 @@ class SmallestFirstEvictionStrategy(EvictionStrategy):
 
     def put(self, cache, key, value):
         """
-        Implements insertion of key-value objects into a cache in a visitor pattern.
+        Implements insertion of key-value objects into a cache in a visitor
+        pattern.
         Evicts smallest objects first if cache is full.
 
-        :param cache: The Cache object to "visit" - perform insertion of object on. (Visitor pattern)
+        :param cache: The Cache object to "visit" - perform insertion of
+        object on. (Visitor pattern)
         :param key: Key of type "key_type" specified at instantiation
         :param value: Value of type "value_type" specified at instantiation
         :return: None
@@ -167,10 +182,10 @@ class SmallestFirstEvictionStrategy(EvictionStrategy):
         """
         Returns object if exists in cache in an O(1) lookup.
 
-        :param cache: The Cache object to "visit" - perform insertion of object on. (Visitor pattern)
-        :param key: Key of type "key_type" specified at instantiation of NSACache
+        :param cache: The Cache object to "visit" - perform insertion of
+        object on. (Visitor pattern)
+        :param key: Key of type "key_type" specified at instantiation of
+        NSACache
         :return: Key-value object if found in cache, else None
         """
         return cache.get_from_lookup_dict(key)
-
-

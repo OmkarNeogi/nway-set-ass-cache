@@ -6,7 +6,8 @@ class NSACache(object):
     An implementation of an n-way set associative cache.
 
     Performs O(1) lookups against elements in each cache.
-    Key and value types have to match key_type and value_type specified at instantiation.
+    Key and value types have to match key_type and value_type specified at
+    instantiation.
     """
 
     def __init__(self, eviction_strategy, num_caches,
@@ -18,8 +19,10 @@ class NSACache(object):
         :param eviction_strategy: One of ["LRU", "MRU", "SF"] by default.
         :param num_caches: Number of caches.
         :param cache_size: Size of each cache.
-        :param key_type: Type of keys. Once chosen, every key has to be of this type.
-        :param value_type: Type of values. Once chose, every value has to be of this type.
+        :param key_type: Type of keys. Once chosen, every key has to be of
+        this type.
+        :param value_type: Type of values. Once chose, every value has to be of
+        this type.
         """
         self.eviction_strategy = eviction_strategy
         self.num_caches = num_caches
@@ -29,16 +32,20 @@ class NSACache(object):
         self.key_type = key_type
         self.value_type = value_type
 
-        self.caches = [Cache(eviction_strategy, cache_size) for _ in range(num_caches)]
+        self.caches = [Cache(eviction_strategy, cache_size)
+                       for _ in range(num_caches)]
 
     def get(self, key, fallback=None):
         """
-        Get value associated with key if key exists in cache. (Amortized O(1) lookup)
+        Get value associated with key if key exists in cache. (Amortized O(1)
+        lookup)
         Raises KeyError if key not in cache.
 
         :param key: A key of "key_type" specified at instantiation
-        :param fallback: Arbitrary fallback value to return in case key does not exist in cache.
-        :return: value of type "value_type" specified at instantiation or fallback value
+        :param fallback: Arbitrary fallback value to return in case key does
+        not exist in cache.
+        :return: value of type "value_type" specified at instantiation or
+        fallback value
         """
 
         cache = self.caches[self.get_cache_from_key(key)]
@@ -53,7 +60,8 @@ class NSACache(object):
     def put(self, key, value):
         """
         Put key value into one of the "num_cache" caches.
-        Key and value types have to match key_type and value_type specified at instantiation.
+        Key and value types have to match key_type and value_type specified
+        at instantiation.
 
         :param key: Key of type "key_type" specified at instantiation
         :param value: Value of type "value_type" specified at instantiation
@@ -67,7 +75,8 @@ class NSACache(object):
 
     def get_cache_from_key(self, key):
         """
-        Chose cache (one of num_cache caches) that shall be deterministically be associated with a key.
+        Chose cache (one of num_cache caches) that shall be deterministically
+        be associated with a key.
 
         :param key: key of type "key_type" specified at instantiation
         :return: Index of cache that shall be associated with a key
@@ -76,7 +85,8 @@ class NSACache(object):
 
     def _validate_kv_type(self, key, value):
         """
-        Validate whether the key and value passed to the put() method are of the type specified at instantiation.
+        Validate whether the key and value passed to the put() method are of
+        the type specified at instantiation.
         Raise ValuError if condition not satisfied.
 
         :param key: Key of type "key_type" specified at instantiation
@@ -87,8 +97,9 @@ class NSACache(object):
             raise TypeError('Key is of type {}. '
                             '{} expected. '.format(type(key), self.key_type))
         if not isinstance(value, self.value_type):
-            raise TypeError('Value is of type {}. '
-                            '{} expected. '.format(type(value), self.value_type))
+            raise TypeError('Value is of type {}. {} expected. '.format(
+                type(value), self.value_type)
+            )
 
     @staticmethod
     def check_key_type_immutable(key_type):
