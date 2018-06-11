@@ -1,5 +1,9 @@
 class DLLDataStructure(object):
     def __init__(self):
+        """
+        A data structure for facilitating double linked list style operations and access.
+        """
+
         from codes.cache_entry import DLLCacheEntry
 
         self.head = DLLCacheEntry(None, "head")
@@ -27,6 +31,11 @@ class DLLDataStructure(object):
 
 
 class HeapDataStructure(object):
+    """
+    A data structure for facilitating heap style operations and access.
+    By default uses a min heap - for the smallest first eviction policy.
+    """
+
     def __init__(self):
         self.min_heap = []
 
